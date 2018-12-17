@@ -48,7 +48,7 @@ function click(ev,gl,canvas,a_Position){
     g_points.push(x);
     g_points.push(y);
 
-    //gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.clear(gl.COLOR_BUFFER_BIT);
     var len = g_points.length;
     console.log(len);
     for(var i=0;i<len;i+=2){
