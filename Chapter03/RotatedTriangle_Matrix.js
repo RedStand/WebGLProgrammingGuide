@@ -1,24 +1,26 @@
 var VSHADER_SOURCE = 
-'attribute vec4 a_Position;' + 
-'void main(){'+
-'gl_Position = a_Position;'+
+'attribute vec4 a_Position;\n' + 
+'uniform mat4  u_xformMatrix;\n' +
+'void main(){\n' + 
+'gl_Position = u_xformMatrix * a_Position;\n' + 
 '}';
 
 var FSHADER_SOURCE = 
 'void main(){gl_FragColor = vec4(1.0,0.0,0.0,1.0);}';
 
+var Angle = 90;
 function main(){
     var canvas = document.getElementById('webgl');
 
-    var gl=getWebGLContext(canvas);
+    var gl = getWebGLContext(canvas);
     if(!gl){
-        console.log('Failed to get the rendering context!');
-        return;
+        console.log('Failed to get the rendering context');
+        return ;
     }
 
-    if(!initShaders(gl,VSHADER_SOURCE,FSHADER_SOURCE)){
+    if (!initShaders (gl,VSHADER_SOURCE,FSHADER_SOURCE)){
         console.log('Failed to initialize shaders');
-        return;
+        return ;
     }
 
     var n = initVertexBuffers(gl);
@@ -27,11 +29,23 @@ function main(){
         return;
     }
 
+    var radian = Math.PI *Angle / 180.0;
+    var cosB = Math.cos(radian) , sinB = Math.sin(radian);
+
+    var xformMatrix  = new Float32Array([
+        cosB , sinB ,0.0,0.0,
+        -sinB , cosB , 0.0,0.0,
+        0.0,0.0,1.0,0.0,
+        0.0,0.0,0.0,1.0
+    ]);
+
+    var u_xformMatrix = gl.getUniformLocation(gl.program , 'u_xformMatrix');
+
+    gl.uniformMatrix4fv(u_xformMatrix , false , xformMatrix);
+
     gl.clear(gl.COLOR_BUFFER_BIT);
-    //gl.drawArrays(gl.TRIANGLES,0 , n);
-    //gl.drawArrays(gl.LINES , 0 , n);
-    //gl.drawArrays(gl.LINE_STRIP , 0 , n);
-    gl.drawArrays(gl.LINE_LOOP , 0 , n);
+
+    gl.drawArrays(gl.TRIANGLES , 0 ,n);
 }
 
 function initVertexBuffers(gl){
@@ -60,5 +74,4 @@ function initVertexBuffers(gl){
 
     gl.enableVertexAttribArray(a_Position);
     return n;
-
 }
